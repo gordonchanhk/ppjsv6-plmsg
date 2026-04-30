@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PayPal JS SDK V6 Demo</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background: #f5f7fa;
+        color: #333;
+        display: flex;
+        justify-content: center;
+        padding: 40px 20px;
+      }
+
+      .container {
+        max-width: 480px;
+        width: 100%;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 24px;
+        text-align: center;
+      }
+
+      .card {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 32px;
+        margin-bottom: 24px;
+      }
+
+      .order-summary {
+        border-bottom: 1px solid #eee;
+        padding-bottom: 16px;
+        margin-bottom: 24px;
+      }
+
+      .order-summary h2 {
+        font-size: 1.1rem;
+        margin-bottom: 12px;
+      }
+
+      .line-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+      }
+
+      .line-item.total {
+        font-weight: 700;
+        font-size: 1.1rem;
+        border-top: 1px solid #eee;
+        padding-top: 8px;
+        margin-top: 8px;
+      }
+
+      #paypal-button-container {
+        min-height: 50px;
+      }
+
+      #status {
+        text-align: center;
+        padding: 12px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        display: none;
+      }
+
+      #status.info {
+        display: block;
+        background: #e8f4fd;
+        color: #1a73e8;
+      }
+
+      #status.success {
+        display: block;
+        background: #e6f4ea;
+        color: #137333;
+      }
+
+      #status.error {
+        display: block;
+        background: #fce8e6;
+        color: #c5221f;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>PayPal V6 SDK Checkout</h1>
+
+      <div class="card">
+        <div class="order-summary">
+          <h2>Order Summary</h2>
+          <div class="line-item">
+            <span>Widget Pro</span>
+            <span>$25.00</span>
+          </div>
+          <div class="line-item">
+            <span>Shipping</span>
+            <span>$5.00</span>
+          </div>
+          <div class="line-item total">
+            <span>Total</span>
+            <span>$30.00</span>
+          </div>
+        </div>
+
+        <div id="paypal-button-container"></div>
+        <hr />
+        <paypal-message
+          amount="300.00"
+          currency-code="GBP"
+          buyer-country="GB"
+        ></paypal-message>
+        <hr />
+      </div>
+
+      <div id="status"></div>
+    </div>
+
+    <script type="module">
+      import { loadCoreSdkScript } from "./node_modules/@paypal/paypal-js/dist/v6/esm/paypal-js.js";
+
+      const CLIENT_ID = "AVEqQeTgMa-pKO-upUk9sU4_PueNV--iHF9thVXl1ubGR4mF7t8x5E730ry8-wA7cyz4iVt4w_7VWIHi"; // Replace with your PayPal client ID
+
+      const statusEl = document.getElementById("status");
+
+      function setStatus(message, type) {
+        statusEl.textContent = message;
+        statusEl.className = type;
+      }
+
+      async function initPayPal() {
+        setStatus("Loading PayPal SDK...", "info");
+
+        // Step 1: Load the V6 core SDK script
+        const paypal = await loadCoreSdkScript({
+          environment: "sandbox",
+        });
+
+        if (!paypal) {
+          setStatus("Failed to load PayPal SDK.", "error");
+          return;
+        }
+
+        // Step 2: Create an SDK instance with your client ID
+        const sdkInstance = await paypal.createInstance({
+          clientId: CLIENT_ID,
+          locale: 'zh-CN',
+          components: ["paypal-payments", "paypal-messages"],
+        });
+
+        const messagesInstance = sdkInstance.createPayPalMessages({
+          buyerCountry: "US",
+          currencyCode: "USD"
+        }); 
+        console.log(`messagesInstance`)
+        console.log(messagesInstance)
+
+        // Step 3: Check eligibility
+        const eligibility = await sdkInstance.findEligibleMethods();
+
+        if (!eligibility.isEligible("paypal")) {
+          setStatus("PayPal is not eligible for this buyer.", "error");
+          return;
+        }
+
+        setStatus("", "");
+
+        // Step 4: Create a PayPal payment session
+        const paymentSession =
+          sdkInstance.createPayPalOneTimePaymentSession({
+            onApprove: async (data) => {
+              setStatus(`Payment approved! Order ID: ${data.orderId}`, "success");
+
+              // In production, capture the order on your server:
+              // const res = await fetch("/api/orders/capture", {
+              //   method: "POST",
+              //   headers: { "Content-Type": "application/json" },
+              //   body: JSON.stringify({ orderId: data.orderId }),
+              // });
+              // const result = await res.json();
+              // console.log("Capture result:", result);
+            },
+            onCancel: () => {
+              setStatus("Payment cancelled by user.", "info");
+            },
+            onError: (err) => {
+              console.error("PayPal error:", err);
+              setStatus("Something went wrong with PayPal.", "error");
+            },
+          });
+
+        // Step 5: Wire up a button to start the payment flow
+        const button = document.createElement("button");
+        button.textContent = "Pay with PayPal";
+        button.style.cssText =
+          "width:100%;padding:14px;font-size:1rem;font-weight:600;" +
+          "background:#0070ba;color:#fff;border:none;border-radius:6px;" +
+          "cursor:pointer;";
+        button.addEventListener("mouseenter", () => {
+          button.style.background = "#005ea6";
+        });
+        button.addEventListener("mouseleave", () => {
+          button.style.background = "#0070ba";
+        });
+
+        button.addEventListener("click", async () => {
+          button.disabled = true;
+          button.textContent = "Processing...";
+          try {
+            // Start the popup flow; the second arg is a function that
+            // creates an order on your server and returns { orderId }.
+            await paymentSession.start(
+              { presentationMode: "popup" },
+              // async () => {
+              //   // Replace with your server-side order creation endpoint
+              //   const res = await fetch("api.html", {
+              //     method: "GET",
+              //     headers: { "Content-Type": "application/json" },
+              //     body: JSON.stringify({ amount: "30.00" }),
+              //   });
+              //   return await res.json(); // must return { orderId: "..." }
+
+              //   // Demo placeholder — in production use a real endpoint
+              //   // return { orderId: "0BF55033GG141343V" };
+              // }
+              createOrderOnServer()
+            );
+          } catch (err) {
+            console.error("Payment start error:", err);
+            setStatus("Failed to start payment.", "error");
+          } finally {
+            button.disabled = false;
+            button.textContent = "Pay with PayPal";
+          }
+        });
+
+        document.getElementById("paypal-button-container").appendChild(button);
+      }
+
+      async function createOrderOnServer() {
+        const response = await fetch("/api", { method: "GET" });
+        return { orderId: "0BF55033GG141343V" };
+      }
+
+      initPayPal().catch((err) => {
+        console.error("Init error:", err);
+        setStatus(`Initialization failed: ${err.message || err}`, "error");
+      });
+    </script>
+  </body>
+</html>
