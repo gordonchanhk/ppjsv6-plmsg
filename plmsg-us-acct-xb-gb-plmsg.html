@@ -1,0 +1,29 @@
+<html>
+    <head> 
+  <script src="https://www.sandbox.paypal.com/web-sdk/v6/core"></script> 
+  <script src="https://www.sandbox.paypal.com/web-sdk/v6/paypal-messages"></script> 
+</head> 
+<body> 
+  <paypal-message 
+    amount="300.00"
+    buyer-country="GB"
+    currency-code="GBP" // but as soon as change to buyer country w/ GBP, it start fail...
+    auto-bootstrap="true"
+  ></paypal-message> 
+  <script> 
+    async function hiho(){
+      console.log(`hi`)
+      // Option 1: Using clientId (no server-side token generation required) 
+      const sdkInstance = await window.paypal.createInstance({ 
+        locale: "zh-CN",
+        components: ['paypal-messages'],
+          clientId: "AVEqQeTgMa-pKO-upUk9sU4_PueNV--iHF9thVXl1ubGR4mF7t8x5E730ry8-wA7cyz4iVt4w_7VWIHi" // Gordon's SB
+      }); 
+
+      const messagesInstance = sdkInstance.createPayPalMessages(); 
+    }
+    hiho()
+    
+  </script> 
+</body>
+</html>
