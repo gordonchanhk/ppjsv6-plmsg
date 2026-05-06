@@ -1,5 +1,8 @@
 # Kick start
 To start, run this:
-`$ npm serve`
+`$ npx serve -p 12345`
 
-Then go to http://localhost:3000/plmsg
+Then visit urls e.g.:
+- http://localhost:12345/plmsg
+- http://localhost:12345/plmsg-hk-acct-xb-gb
+- http://localhost:12345/plmsg-us-acct-xb-gb
