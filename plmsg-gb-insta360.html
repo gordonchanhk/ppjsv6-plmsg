@@ -1,0 +1,39 @@
+<html>
+    <head> 
+  <script src="https://www.paypal.com/web-sdk/v6/core"></script> 
+  <script src="https://www.paypal.com/web-sdk/v6/paypal-messages"></script> 
+</head> 
+<body> 
+  <paypal-message 
+    amount="300.00"
+    buyer-country="GB"
+    currency-code="GBP" // but as soon as change to buyer country w/ GBP, it start fail...
+    auto-bootstrap="true"
+  ></paypal-message> 
+  <script> 
+    async function hiho(){
+      console.log(`hi`)
+      // Option 1: Using clientId (no server-side token generation required) 
+      const sdkInstance = await window.paypal.createInstance({ 
+        pageType: "checkout",
+        locale: "zh-CN",
+        components: ['paypal-messages'],
+          clientId: "ATLzVpKtmxNkJaYfu96GXKDWR_rMsNbFgcut86O5qjfiH2su5zDJP6tlilDcBR9Xt62qoab9zzEOCa30" // Gordon's SB
+      }); 
+
+      const messagesInstance = sdkInstance.createPayPalMessages({
+        amount: 300,
+        currencyCode: 'GBP',
+        buyerCountry: 'GB',
+        presentationMode: 'MODAL',
+      }); 
+    }
+    hiho()
+    
+    function triggerAmountUpdate(amount) { 
+      const messageElement = document.querySelector('paypal-message'); 
+      messageElement.setAttribute('amount', amount); 
+    } 
+  </script> 
+</body>
+</html>
