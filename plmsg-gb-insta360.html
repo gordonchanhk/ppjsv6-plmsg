@@ -28,6 +28,13 @@
         buyerCountry: 'GB',
         presentationMode: 'MODAL',
       }); 
+      console.log(config)
+      var learnMore = instance.createPayPalMessages().createLearnMore(config);
+      if (learnMore) {
+        learnMore.open();
+      } else {
+        window.open('https://www.paypal.com/us/digital-wallet/ways-to-pay/buy-now-pay-later', '_blank');
+      }
     }
     hiho()
     
