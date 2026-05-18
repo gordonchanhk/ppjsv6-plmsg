@@ -3,7 +3,8 @@
   <script src="https://www.sandbox.paypal.com/web-sdk/v6/core"></script> 
   <script src="https://www.sandbox.paypal.com/web-sdk/v6/paypal-messages"></script> 
 </head> 
-<body> 
+<body>
+  <h1>JSv6 - Sandbox PayPal XB Pay Later Message</h1>
   <paypal-message 
     amount="300.00"
     buyer-country="GB"
@@ -11,8 +12,7 @@
     auto-bootstrap="true"
   ></paypal-message> 
   <script> 
-    async function hiho(){
-      console.log(`hi`)
+    async function kickStart(){
       // Option 1: Using clientId (no server-side token generation required) 
       const sdkInstance = await window.paypal.createInstance({ 
         pageType: "checkout",
@@ -24,12 +24,8 @@
 
       const messagesInstance = sdkInstance.createPayPalMessages(); 
     }
-    hiho()
     
-    function triggerAmountUpdate(amount) { 
-      const messageElement = document.querySelector('paypal-message'); 
-      messageElement.setAttribute('amount', amount); 
-    } 
+    kickStart()
   </script> 
 </body>
 </html>
