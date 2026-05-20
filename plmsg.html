@@ -12,7 +12,8 @@
     auto-bootstrap="true"
   ></paypal-message> 
   <script> 
-    async function kickStart(){
+    async function renderPayLaterMessage(){
+      console.log(`Fnc: renderPayLaterMessage invoked`)
       // Option 1: Using clientId (no server-side token generation required) 
       const sdkInstance = await window.paypal.createInstance({ 
         pageType: "checkout",
@@ -25,7 +26,7 @@
       const messagesInstance = sdkInstance.createPayPalMessages(); 
     }
     
-    kickStart()
+    renderPayLaterMessage()
   </script> 
 </body>
 </html>

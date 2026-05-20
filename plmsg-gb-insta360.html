@@ -13,7 +13,7 @@
   ></paypal-message> 
   <script> 
     async function hiho(){
-      console.log(`hi`)
+      console.log(`Fnc: renderPayLaterMessage invoked`)
       // Option 1: Using clientId (no server-side token generation required) 
       const sdkInstance = await window.paypal.createInstance({ 
         pageType: "checkout",
@@ -25,6 +25,10 @@
       const messagesInstance = sdkInstance.createPayPalMessages(); 
     }
     hiho()
+    function triggerAmountUpdate(amount) {
+      const messageElement = document.querySelector('paypal-message');
+      messageElement.setAttribute('amount', amount);
+    }
   </script> 
 </body>
 </html>

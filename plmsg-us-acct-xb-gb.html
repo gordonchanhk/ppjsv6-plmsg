@@ -11,7 +11,7 @@
     auto-bootstrap="true"
   ></paypal-message> 
   <script> 
-    async function hiho(){
+    async function renderPayLaterMessage(){
       console.log(`hi`)
       // Option 1: Using clientId (no server-side token generation required) 
       const sdkInstance = await window.paypal.createInstance({ 
@@ -22,8 +22,12 @@
 
       const messagesInstance = sdkInstance.createPayPalMessages(); 
     }
-    hiho()
+    renderPayLaterMessage()
     
+    function triggerAmountUpdate(amount) {
+      const messageElement = document.querySelector('paypal-message');
+      messageElement.setAttribute('amount', amount);
+    }
   </script> 
 </body>
 </html>
